@@ -31,6 +31,7 @@
 #include "ScriptUnit.h"
 #include "TLuaInterpreter.h"
 #include "TimerUnit.h"
+#include "TMainConsole.h"
 #include "TriggerUnit.h"
 #include "XMLexport.h"
 #include "ctelnet.h"
@@ -58,6 +59,7 @@ class LuaInterface;
 class TMedia;
 class TRoom;
 class TConsole;
+class TMainConsole;
 class dlgNotepad;
 class TMap;
 
@@ -194,6 +196,7 @@ public:
     bool isClosingDown();
     unsigned int assemblePath();
     bool checkForMappingScript();
+    bool checkForCustomSpeedwalk();
 
     TriggerUnit* getTriggerUnit() { return &mTriggerUnit; }
     TimerUnit* getTimerUnit() { return &mTimerUnit; }
@@ -251,6 +254,7 @@ public:
     QPair<bool, QString> resetAndRestartStopWatch(const int);
 
     void startSpeedWalk();
+    void startSpeedWalk(int sourceRoom, int targetRoom);
     void saveModules(int sync, bool backup = true);
     void reloadModule(const QString& reloadModuleName);
     std::pair<bool, QString> changeModuleSync(const QString& enableModuleName, const QLatin1String &value);
@@ -332,7 +336,7 @@ public:
 
 
     cTelnet mTelnet;
-    QPointer<TConsole> mpConsole;
+    QPointer<TMainConsole> mpConsole;
     TLuaInterpreter mLuaInterpreter;
 
     int commandLineMinimumHeight;

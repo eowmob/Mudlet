@@ -1451,7 +1451,6 @@ bool TMap::restore(QString location, bool downloadIfNotFound)
                                                                           |QFont::PreferOutline | QFont::PreferAntialias | QFont::PreferQuality
                                                                           |QFont::PreferNoShaping
                                                                           ));
-
         if (mVersion >= 14) {
             int areaSize;
             ifs >> areaSize;
@@ -1934,7 +1933,7 @@ int TMap::createMapImageLabel(int area, QString imagePath, float x, float y, flo
     label.showOnTop = showOnTop;
     label.noScaling = noScaling;
 
-    QRectF drawRect = QRectF(0, 0, width * zoom, height * zoom);
+    QRectF drawRect = QRectF(0, 0, static_cast<qreal>(width * zoom), static_cast<qreal>(height * zoom));
     QPixmap imagePixmap = QPixmap(imagePath);
     QPixmap pix = QPixmap(drawRect.size().toSize());
     pix.fill(Qt::transparent);
@@ -2544,3 +2543,37 @@ QString TMap::getMmpMapLocation() const
 {
     return mMmpMapLocation;
 }
+
+bool TMap::getRoomNamesPresent()
+{
+    return mUserData.contains(ROOM_UI_SHOWNAME);
+}
+
+bool TMap::getRoomNamesShown()
+{
+    return getUserDataBool(mUserData, ROOM_UI_SHOWNAME, false);
+}
+
+void TMap::setRoomNamesShown(bool shown)
+{
+    setUserDataBool(mUserData, ROOM_UI_SHOWNAME, shown);
+}
+
+void TMap::update()
+{
+#if defined(INCLUDE_3DMAPPER)
+    if (mpM) {
+        mpM->update();
+    }
+#endif
+    if (mpMapper) {
+        mpMapper->showRoomNames->setVisible(getRoomNamesPresent());
+        mpMapper->showRoomNames->setChecked(getRoomNamesShown());
+
+        if (mpMapper->mp2dMap) {
+            mpMapper->mp2dMap->mNewMoveAction = true;
+            mpMapper->mp2dMap->update();
+        }
+    }
+}
+
